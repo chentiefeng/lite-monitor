@@ -1,0 +1,63 @@
+server:
+  port: 10003
+
+spring:
+  #============== redis ===================
+#  redis:
+#    host: 172.16.157.239
+#    port: 6379
+#    timeout: 6000
+#    password:
+#    database: 3
+#    pool:
+#      max-active: 1000
+#      max-wait: -1
+#      max-idle: 10
+#      min-idle: 5
+
+  #============== kafka ===================
+#  kafka:
+#    bootstrap-servers: cm02:9092,cm03:9092,cm04:9092
+#    producer:
+#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+#      acks: all
+#    consumer:
+#      group-id: lite-monitor
+#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+#      max-poll-records: 10
+#    listener:
+#      type: batch
+#      concurrency: 4
+#      ack-mode: MANUAL
+#      missing-topics-fatal: false
+
+  #============== dataSource ==================
+  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/lite_monitor?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
+#    username: root
+#    password: 123456
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:~/lite-monitor
+    username: sa
+    password: 123456
+  jpa:
+#    database: mysql
+    database: h2
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+monitor:
+  #是否集群，集群模式请用MySQL,注释掉h2部分，会分发定时任务 false/true
+  cluster: false
+  #集群模式下，集群检查分钟数，3分钟没有反应则表明机器挂了
+#  duration: 3
+  #集群模式下，是否注册本机 online/offline
+#  hostState: online
+  #集群模式下分布式锁类型，db/redis，选择redis把redis的配置注释打开
+#  distributed-lock-type: db
+  #集群模式下分发类型，http/redis/kafka，选择其他需要把注释打开
+#  distribute-task-type: kafka
