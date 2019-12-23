@@ -10,7 +10,8 @@
     <div align="center">
         <img src="https://chen_tiefeng.gitee.io/cloudimg/img/1576853070_799768.png" width = "500" height = "100" />
     </div>
-    <div class="mod-liteMonitor" style='padding:50px 15% 40px 15%;font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;'>
+    <el-divider></el-divider>
+    <div class="mod-liteMonitor" style='padding:20px 15% 40px 15%;font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;'>
         <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
             <el-form-item>
                 <el-col :span="12">
@@ -118,6 +119,10 @@
         </el-pagination>
         <!-- 弹窗, 新增 / 修改 -->
         <add-or-update v-show="addOrUpdateVisible" ref="addOrUpdate" @refresh="getDataList"></add-or-update>
+    </div>
+    <el-divider></el-divider>
+    <div align="center" style="font-size:10px;">
+        <a href="https://chentiefeng.top" target="_blank">Blog</a>  <a href="https://github.com/chentiefeng/lite-monitor" target="_blank">Github</a>
     </div>
 </div>
 </body>
