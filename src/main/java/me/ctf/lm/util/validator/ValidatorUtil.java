@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import javax.validation.groups.Default;
 import java.util.Set;
 
 /**
@@ -30,11 +31,14 @@ public class ValidatorUtil {
      */
     public static void validateEntity(Object object, Class<?>... groups)
             throws BizException {
-        Set<ConstraintViolation<Object>> constraintViolations = validator.validate(object, groups);
+        Class<?>[] realGroups = new Class<?>[groups.length + 1];
+        System.arraycopy(groups, 0, realGroups, 0, groups.length);
+        realGroups[groups.length] = Default.class;
+        Set<ConstraintViolation<Object>> constraintViolations = validator.validate(object, realGroups);
         if (!constraintViolations.isEmpty()) {
             StringBuilder msg = new StringBuilder();
             for (ConstraintViolation<Object> constraint : constraintViolations) {
-                msg.append(constraint.getMessage()).append("<br>");
+                msg.append(constraint.getMessage());
             }
             throw new BizException(msg.toString());
         }

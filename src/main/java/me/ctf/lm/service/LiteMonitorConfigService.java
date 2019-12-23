@@ -71,4 +71,11 @@ public interface LiteMonitorConfigService {
      * @param ids
      */
     List<LiteMonitorConfigEntity> findByIds(Long[] ids);
+
+    /**
+     * info
+     * @param id
+     * @return
+     */
+    LiteMonitorConfigEntity info(Long id);
 }

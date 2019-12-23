@@ -3,12 +3,14 @@ package me.ctf.lm.controller;
 import lombok.extern.slf4j.Slf4j;
 import me.ctf.lm.dto.MapResult;
 import me.ctf.lm.entity.LiteMonitorConfigEntity;
+import me.ctf.lm.enums.FrequencyEnum;
 import me.ctf.lm.schedule.ScheduleCmdExecutor;
 import me.ctf.lm.service.LiteMonitorConfigService;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.*;
 
 /**
  * @author: chentiefeng[chentiefeng@linzikg.com]
@@ -94,7 +96,18 @@ public class LiteMonitorController {
     }
 
     /**
-     * 禁用
+     * 启用
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/info")
+    public MapResult info(@RequestParam("id") Long id) {
+        return MapResult.ok().put("entity", liteMonitorConfigService.info(id));
+    }
+
+    /**
+     * info
      *
      * @param id
      * @return
@@ -103,5 +116,22 @@ public class LiteMonitorController {
     public MapResult disabled(@RequestParam("id") Long id) {
         liteMonitorConfigService.disabled(id);
         return MapResult.ok();
+    }
+
+    /**
+     * frequency
+     *
+     * @return
+     */
+    @GetMapping("/frequency")
+    public MapResult frequency() {
+        List<Map<String, String>> mapList = new ArrayList<>();
+        Arrays.stream(FrequencyEnum.values()).forEach(value -> {
+            Map<String, String> map = new HashMap<>(1);
+            map.put("frequency", value.getCron());
+            map.put("frequencyDesc", value.getDesc());
+            mapList.add(map);
+        });
+        return MapResult.ok().put("frequencyList", mapList);
     }
 }

@@ -31,4 +31,13 @@ public enum FrequencyEnum {
     ;
     private String cron;
     private String desc;
+
+    public static FrequencyEnum getByValue(String frequency) {
+        for (FrequencyEnum value : values()) {
+            if (value.cron.equalsIgnoreCase(frequency)) {
+                return value;
+            }
+        }
+        return null;
+    }
 }

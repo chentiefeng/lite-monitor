@@ -36,6 +36,9 @@ public class LiteMonitorConfigEntity {
     @Column(nullable = false)
     @NotBlank(message = "监控频率不能为空")
     private String frequency;
+
+    @Transient
+    private String frequencyDesc;
     /**
      * 主机
      */

@@ -2,23 +2,25 @@ package me.ctf.lm.service.impl;
 
 import me.ctf.lm.dao.LiteMonitorConfigRepository;
 import me.ctf.lm.entity.LiteMonitorConfigEntity;
+import me.ctf.lm.enums.FrequencyEnum;
 import me.ctf.lm.enums.MonitorEnableEnum;
 import me.ctf.lm.enums.MonitorTypeEnum;
 import me.ctf.lm.service.LiteMonitorConfigService;
 import me.ctf.lm.util.UpdateUtils;
 import me.ctf.lm.util.validator.LogGroup;
 import me.ctf.lm.util.validator.ValidatorUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
+import javax.validation.groups.Default;
 import java.util.*;
 
 /**
@@ -60,7 +62,7 @@ public class LiteMonitorConfigServiceImpl implements LiteMonitorConfigService {
 
     @Override
     public Page<LiteMonitorConfigEntity> page(String hostName, String remark, String frequency, Integer enabled, Pageable pageable) {
-        return this.liteMonitorConfigRepository.findAll((Specification<LiteMonitorConfigEntity>) (root, criteriaQuery, criteriaBuilder) -> {
+        Page<LiteMonitorConfigEntity> all = this.liteMonitorConfigRepository.findAll((Specification<LiteMonitorConfigEntity>) (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> list = new ArrayList<>();
             if (!StringUtils.isEmpty(hostName)) {
                 list.add(criteriaBuilder.equal(root.get("hostName"), hostName));
@@ -77,6 +79,10 @@ public class LiteMonitorConfigServiceImpl implements LiteMonitorConfigService {
             Predicate[] predicates = new Predicate[list.size()];
             return criteriaBuilder.and(list.toArray(predicates));
         }, pageable);
+        for (LiteMonitorConfigEntity liteMonitorConfigEntity : all) {
+            liteMonitorConfigEntity.setFrequencyDesc(Objects.requireNonNull(FrequencyEnum.getByValue(liteMonitorConfigEntity.getFrequency())).getDesc());
+        }
+        return all;
     }
 
 
@@ -111,5 +117,15 @@ public class LiteMonitorConfigServiceImpl implements LiteMonitorConfigService {
             Arrays.stream(ids).forEach(in::value);
             return in;
         });
+    }
+
+    @Override
+    public LiteMonitorConfigEntity info(Long id) {
+        Optional<LiteMonitorConfigEntity> optional = liteMonitorConfigRepository.findById(id);
+        if (optional.isPresent()) {
+            optional.get().setFrequencyDesc(Objects.requireNonNull(FrequencyEnum.getByValue(optional.get().getFrequency())).getDesc());
+            return optional.get();
+        }
+        return null;
     }
 }

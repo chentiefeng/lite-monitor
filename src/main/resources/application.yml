@@ -60,4 +60,4 @@ monitor:
   #集群模式下分布式锁类型，db/redis，选择redis把redis的配置注释打开
 #  distributed-lock-type: db
   #集群模式下分发类型，http/redis/kafka，选择其他需要把注释打开
-#  distribute-task-type: kafka
+#  distribute-task-type: http
