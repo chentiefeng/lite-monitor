@@ -7,14 +7,19 @@
 
 ## 介绍
 
-`lite-monitor` 一款基于日志文件和shell命令的监控系统，可以根据项目中输出的日志定时输出或者统计输出，并发送钉钉机器人报警消息。
+`lite-monitor` 一款基于shell命令的监控系统，可以根据项目中输出的日志定时输出或者统计输出，并发送钉钉机器人报警消息。
 
-`lite-monitor`的特点：
+`lite-monitor`能做什么：
+
+ - 定时监控某个服务进程是否还存在，不存在则钉钉告警。
+ - 定时统计近一段时间内具体日志文件中关键字出现的次数，并对次数做一个阈值比较，超出阈值则钉钉告警并输出日志。
+ - 进阶监控（qps/计算效率等）可以根据`awk`等命令自定义实现。
+
+ `lite-monitor`的特点：
 
  - 每个监控可配置不同钉钉群机器人，可配置@具体人或者@all
  - 对已有项目无任何入侵，不需要重启或者其他操作。
  - 可以单机版极简配置（服务器安装有Java就行），或者集群部署（除非监控很多，否则基本没有必要 :smile:）。
-
 
 > 在使用或开发过程中有任何疑问都可[联系我](https://chentiefeng.top) 。
 
@@ -22,11 +27,7 @@
 
 * [x] [集群模式支持分发监控任务]。
 * [x] [增加可选择`redis/kafka`分发任务]。
-* [ ] 选择`redis`后缓存监控任务。
 * [ ] 根据监控的阀值可定制推送/触发接口。
-* [ ] 增加多种报警方式可选（短信、邮件等）。
-
-
 
 ## 流程图
 
@@ -67,10 +68,77 @@ nohup java -jar  lite-monitor-0.0.1-SNAPSHOT.jar 2>&1 &
 
 > 日志文件位置：`~/lite-monitor-server/logs/m.log`。
 
-### 监控配置
+### 配置监控
 
-### 钉钉消息展示
+浏览器输入地址`http://xx.xx.xx.xx:10003/`打开主页。
+![](https://chen_tiefeng.gitee.io/cloudimg/img/Clip_20191223_160005.png)
 
+#### 进程监控
+
+我要监控本地机器（测试方便）的indicator-service进程（本来就没有）。
+
+
+新增。
+![](https://chen_tiefeng.gitee.io/cloudimg/img/Clip_20191223_160658.png)
+
+
+确认-立即执行（测试一下）。
+![](https://chen_tiefeng.gitee.io/cloudimg/img/Clip_20191223_160917.png)
+
+
+钉钉消息。
+![](https://chen_tiefeng.gitee.io/cloudimg/img/ps-monitor.jpg)
+
+#### 日志监控
+我要监控本地机器（可以替换其他机器）的lite-monitor服务的近1分钟出现`frequency`关键字的日志数量，超过2个就报警，钉钉展示10条消息。
+
+复制，改改信息。
+![](https://chen_tiefeng.gitee.io/cloudimg/img/Clip_20191223_162355.png)
+
+
+确认-立即执行（测试一下），钉钉消息。
+![](https://chen_tiefeng.gitee.io/cloudimg/img/log-monitor.jpg)
+
+
+## 字段说明
+
+- 监控类型：日志/进程，主要是生成的命令不同。
+
+- 监控频率：定时触发的频率，cron表达式。
+> 如果需要新增删改可以在源码的`me.ctf.lm.enums.FrequencyEnum`枚举类中修改。
+
+- ip地址：被监控的机器的IP地址。
+
+- 端口：被监控的机器的ssh端口，默认22。
+
+- 用户：被监控的机器可以ssh登录的用户名。
+
+- **密码/密钥文件地址：两者填写一个即可，密钥文件需要提前上传到部署机器上。**
+> 两者都填，优先使用密码登录ssh。
+> 两者都为空，需要实现免密登录，将部署机器的ssh的id_rsa.pub内容复制到被监控机器的`~/.ssh/authorized_keys`，例子中我就做了这事。
+
+- 日志文件：监控类型为日志的时候需要填写，日志的绝对路径。
+
+- 统计范围：监控类型为日志的时候需要填写，单位秒，范围：触发时间点往前减去N秒至触发时间点。
+
+- 阈值：监控类型为日志的时候需要填写，日志在统计范围内出现多少次就报警。
+
+- 展示条数：监控类型为日志的时候需要填写，在钉钉消息里面展示的日志数量。
+
+- **命令：监控类型为日志的时候需要填写，在系统生成的命令后面增加管道命令。**
+> 系统生成的命令为：`grep -e '2019-12-23 16:55:[3-9][0-9]' -e '2019-12-23 16:55:2[7-9]' /root/lite-monitor-server/logs/m.logs`，在后面增加`grep frequency`，最后生成的命令为`grep -e '2019-12-23 16:55:[3-9][0-9]' -e '2019-12-23 16:55:2[7-9]' /root/lite-monitor-server/logs/m.logs|grep frequency`。
+>> 时间的正则表达式生成参考：[时间正则](https://chentiefeng.top/2019/03/09/datetime-regex/)
+> 这里也可以填写`awk`等命令，统计一些效率/QPS等，比如统计QPS`grep '计算结束'|awk '{sum += 1} END {if(sum>60){print "近1分钟服务请求数量:" sum; print "近1分钟服务QPS:" sum/60}}'`。![](https://chen_tiefeng.gitee.io/cloudimg/img/qps-monitor.jpg)
+
+- **关键字：监控类型为进程的时候需要填写，进程的关键字。**
+> 监控进程的命令`ps -ef|grep 'xx'|grep -v grep|awk '{print $2}'`，打印进程id，不存在则报警。
+
+- 钉钉标题：钉钉消息Markdown格式的标题
+
+- 钉钉机器人token：钉钉机器人token，[钉钉机器人官方教程](https://ding-doc.dingtalk.com/doc#/serverapi2/qf2nxq)
+
+- 钉钉@人员：@人员的手机号码，多个以,分开
+> @all的话直接输入all
 
 ## 配置项说明
 
@@ -163,4 +231,5 @@ monitor:
 ## 联系作者
 - [chentiefeng@aliyun.com](mailto:chentiefeng@aliyun.com)
 - ![](https://chen_tiefeng.gitee.io/cloudimg/img/wx_chentiefeng.jpg)
+
 
