@@ -28,7 +28,7 @@
       <el-form-item label="描述" prop="remark">
         <el-input v-model="dataForm.remark" placeholder="备注"></el-input>
       </el-form-item>
-      <el-form-item label="ip地址" prop="host">
+      <el-form-item label="ip地址" prop="hostName">
         <el-input v-model="dataForm.hostName" placeholder="ip地址"></el-input>
       </el-form-item>
       <el-form-item label="端口" prop="port">
