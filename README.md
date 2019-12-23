@@ -99,6 +99,8 @@ nohup java -jar  lite-monitor-0.0.1-SNAPSHOT.jar 2>&1 &
 确认-立即执行（测试一下），钉钉消息。
 ![](https://chen_tiefeng.gitee.io/cloudimg/img/log-monitor.jpg)
 
+#### 试用
+[lite-monitor](https://lite-monitor.chentiefeng.top)
 
 ## 字段说明
 
