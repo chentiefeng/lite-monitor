@@ -100,7 +100,7 @@ nohup java -jar  lite-monitor-0.0.1-SNAPSHOT.jar 2>&1 &
 ![](https://chen_tiefeng.gitee.io/cloudimg/img/log-monitor.jpg)
 
 #### 试用
-[lite-monitor](https://lite-monitor.chentiefeng.top)
+[lite-monitor](https://lite-monitor.chentiefeng.top)，可以将钉钉机器人token改为自己的试用
 
 ## 字段说明
 
