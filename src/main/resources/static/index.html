@@ -7,12 +7,12 @@
     <title>lite-monitor</title>
     <link rel="shortcut icon" type="image/x-icon" href="./img/favicon.ico">
     <!-- import CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.13.0/lib/theme-chalk/index.css">
 </head>
 <body>
 <div id="app">
     <div align="center">
-        <img src="https://chen_tiefeng.gitee.io/cloudimg/img/1576853070_799768.png" width = "500" height = "100" />
+        <img src="./img/1576853070_799768.png" width = "500" height = "100" />
     </div>
     <el-divider></el-divider>
     <div class="mod-liteMonitor" style='padding:20px 15% 40px 15%;font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;'>
@@ -131,12 +131,12 @@
 </div>
 </body>
 <!-- import Vue before Element -->
-<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vue@2.5.2/dist/vue.js"></script>
 <!-- import JavaScript -->
-<script src="https://unpkg.com/element-ui/lib/index.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<script src="https://unpkg.com/http-vue-loader"></script>
-<script src="./app.js"></script>
+<script src="https://unpkg.com/element-ui@2.13.0/lib/index.js"></script>
+<script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
+<script src="https://unpkg.com/http-vue-loader@1.4.1/src/httpVueLoader.js"></script>
+<script src="./js/app.js"></script>
 <script>
   Vue.component('add-or-update', httpVueLoader('./monitor-add-or-update.vue'))
   new Vue({
