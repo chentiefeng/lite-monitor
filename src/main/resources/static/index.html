@@ -167,7 +167,7 @@
           let data = res.data
           if (data && data.code === 0) {
             this.dataList = data.page.content
-            this.totalPage = data.page.totalPages
+            this.totalPage = data.page.totalElements
           } else {
             this.dataList = []
             this.totalPage = 0

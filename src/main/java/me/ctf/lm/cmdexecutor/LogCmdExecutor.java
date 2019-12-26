@@ -6,6 +6,7 @@ import me.ctf.lm.enums.MonitorTypeEnum;
 import me.ctf.lm.util.DateTimeRegex;
 import me.ctf.lm.util.DingMarkdownMessage;
 import me.ctf.lm.util.DingTalkHelper;
+import me.ctf.lm.util.PlaceholderUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -85,7 +86,8 @@ public class LogCmdExecutor extends AbstractCmdExecutor {
         for (String regex : DateTimeRegex.dateUntilNowFormat(pre)) {
             cmd.append(" -e '").append(regex).append("'");
         }
-        cmd.append(" ").append(monitor.getFilePath());
+        //2019.12.26 日志文件路径支持日期占位符
+        cmd.append(" ").append(PlaceholderUtil.analyze(monitor.getFilePath(), null));
         if (StringUtils.isNoneBlank(monitor.getShellCmd())) {
             cmd.append(" | ").append(monitor.getShellCmd());
         }

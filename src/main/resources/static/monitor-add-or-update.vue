@@ -47,6 +47,18 @@
       <div v-if="dataForm.monitorType === 'LOG'">
         <el-form-item label="日志文件" prop="filePath">
           <el-input v-model="dataForm.filePath" placeholder="/root/lite-monitor-server/logs/m.log"></el-input>
+          <el-tooltip class="item" title="日期占位符说明" effect="dark" placement="bottom-start">
+            <div slot="content">
+                支持指定字段增减：</br>
+                <i>例子1：${yyyyMMdd} = 20191226</i><br/>
+                <i>例子2：${yyyyMMdd,-1} = 20191225</i><br/>
+                <i>例子3：${yyyyMMdd,-1,Months} = 20191126</i><br/>
+                常用日期格式：yyyy=年，MM=月，dd=日，HH=小时，mm=分钟，ss=秒 </br>
+                更多格式请参考：https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html </br>
+                更多单位请参考：https://docs.oracle.com/javase/8/docs/api/java/time/temporal/ChronoUnit.html
+            </div>
+            <el-alert title="支持日期占位符，如/home/admin/m-${yyyyMMdd}.log" type="info" show-icon>
+          </el-tooltip>
         </el-form-item>
         <el-form-item label="统计范围" prop="statSecond">
           <el-input v-model="dataForm.statSecond" placeholder="统计近多少秒之内的日志"></el-input>
