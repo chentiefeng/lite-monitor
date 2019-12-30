@@ -20,5 +20,5 @@ public interface DistributedLockService {
      *
      * @param lockName
      */
-    void release(String lockName);
+    boolean release(String lockName);
 }

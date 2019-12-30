@@ -1,4 +1,4 @@
-package me.ctf.lm.service.impl.distributedlock;
+package me.ctf.lm.service.impl.distributetask;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.extern.slf4j.Slf4j;

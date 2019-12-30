@@ -32,7 +32,8 @@ public class DbDistributedLockServiceImpl implements DistributedLockService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void release(String lockName) {
+    public boolean release(String lockName) {
         liteMonitorExecSupportInfoRepository.deleteByLockName(LOCK, lockName);
+        return true;
     }
 }

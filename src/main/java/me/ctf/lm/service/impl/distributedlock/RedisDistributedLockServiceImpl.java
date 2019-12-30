@@ -1,16 +1,15 @@
-package me.ctf.lm.service.impl.distributetask;
+package me.ctf.lm.service.impl.distributedlock;
 
 import lombok.extern.slf4j.Slf4j;
 import me.ctf.lm.service.DistributedLockService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.Duration;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author: chentiefeng[chentiefeng@linzikg.com]
@@ -24,6 +23,15 @@ public class RedisDistributedLockServiceImpl implements DistributedLockService {
     private ThreadLocal<Deque<String>> threadLocalLockDeque = new ThreadLocal<>();
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    private static DefaultRedisScript<Long> defaultRedisScript;
+    private static final Long RELEASE_SUCCESS = 1L;
+
+    static {
+        defaultRedisScript = new DefaultRedisScript<>();
+        defaultRedisScript.setResultType(Long.class);
+        defaultRedisScript.setScriptText("if redis.call('get', KEYS[1]) == KEYS[2] then return redis.call('del', KEYS[1]) else return 0 end");
+    }
 
     @Override
     public boolean lock(String lockName) {
@@ -47,16 +55,13 @@ public class RedisDistributedLockServiceImpl implements DistributedLockService {
     }
 
     @Override
-    public void release(String lockName) {
+    public boolean release(String lockName) {
         try {
-            String value = stringRedisTemplate.opsForValue().get(lockName);
-            if (value == null) {
-                log.warn("lock [{}] is released.", lockName);
-                return;
-            }
-            if (value.equals(threadLocalLockDeque.get().pop())) {
-                stringRedisTemplate.delete(lockName);
-            }
+            List<String> args = new ArrayList<>();
+            args.add(lockName);
+            args.add(threadLocalLockDeque.get().pop());
+            Long result = stringRedisTemplate.execute(defaultRedisScript, args);
+            return RELEASE_SUCCESS.equals(result);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         } finally {
@@ -64,5 +69,6 @@ public class RedisDistributedLockServiceImpl implements DistributedLockService {
                 threadLocalLockDeque.remove();
             }
         }
+        return false;
     }
 }
