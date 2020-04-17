@@ -115,7 +115,7 @@
           filePath: undefined,
           threshold: undefined,
           shellCmd: undefined,
-          dingType: 'dingding'',
+          dingType: 'dingding',
           dingTitle: undefined,
           dingToken: undefined,
           statSecond: undefined,
