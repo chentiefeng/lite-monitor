@@ -77,13 +77,16 @@
       <el-form-item v-if="dataForm.monitorType === 'PROCESS'" label="关键字" prop="shellCmd">
         <el-input v-model="dataForm.shellCmd" placeholder="lite-monitor-service"></el-input>
       </el-form-item>
-      <el-form-item label="钉钉标题" prop="dingTitle">
-        <el-input v-model="dataForm.dingTitle" placeholder="钉钉提醒消息标题"></el-input>
+      <el-form-item label="提醒类型" prop="dingType">
+        <el-input v-model="dataForm.dingType" placeholder="提醒类型（dingding、feishu）,默认dingding"></el-input>
       </el-form-item>
-      <el-form-item label="钉钉机器人token" prop="dingToken">
-        <el-input v-model="dataForm.dingToken" placeholder="钉钉机器人token"></el-input>
+      <el-form-item label="消息标题" prop="dingTitle">
+        <el-input v-model="dataForm.dingTitle" placeholder="提醒消息标题"></el-input>
       </el-form-item>
-      <el-form-item label="钉钉@人员" prop="dingAt">
+      <el-form-item label="机器人token" prop="dingToken">
+        <el-input v-model="dataForm.dingToken" placeholder="机器人token"></el-input>
+      </el-form-item>
+      <el-form-item label="@人员" prop="dingAt">
         <el-input v-model="dataForm.dingAt" placeholder="多个手机号用英文逗号分割"></el-input>
       </el-form-item>
     </el-form>
@@ -112,6 +115,7 @@
           filePath: undefined,
           threshold: undefined,
           shellCmd: undefined,
+          dingType: 'dingding'',
           dingTitle: undefined,
           dingToken: undefined,
           statSecond: undefined,
@@ -177,6 +181,7 @@
                 this.dataForm.filePath = data.entity.filePath
                 this.dataForm.threshold = data.entity.threshold
                 this.dataForm.shellCmd = data.entity.shellCmd
+                this.dataForm.dingType = data.entity.dingType
                 this.dataForm.dingTitle = data.entity.dingTitle
                 this.dataForm.dingToken = data.entity.dingToken
                 this.dataForm.statSecond = data.entity.statSecond
@@ -221,6 +226,7 @@
               this.dataForm.filePath = data.entity.filePath
               this.dataForm.threshold = data.entity.threshold
               this.dataForm.shellCmd = data.entity.shellCmd
+              this.dataForm.dingType = data.entity.dingType
               this.dataForm.dingTitle = data.entity.dingTitle
               this.dataForm.dingToken = data.entity.dingToken
               this.dataForm.statSecond = data.entity.statSecond

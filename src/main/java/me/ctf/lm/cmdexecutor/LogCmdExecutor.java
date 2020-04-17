@@ -2,11 +2,9 @@ package me.ctf.lm.cmdexecutor;
 
 import lombok.extern.slf4j.Slf4j;
 import me.ctf.lm.entity.LiteMonitorConfigEntity;
+import me.ctf.lm.enums.DingTypeEnum;
 import me.ctf.lm.enums.MonitorTypeEnum;
-import me.ctf.lm.util.DateTimeRegex;
-import me.ctf.lm.util.DingMarkdownMessage;
-import me.ctf.lm.util.DingTalkHelper;
-import me.ctf.lm.util.PlaceholderUtil;
+import me.ctf.lm.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -50,7 +48,11 @@ public class LogCmdExecutor extends AbstractCmdExecutor {
             return;
         }
         //发送订单消息
-        ding(monitor, nowStr, preStr, list);
+        if (DingTypeEnum.FEISHU.name().equalsIgnoreCase(monitor.getDingType())) {
+            feishu(monitor, nowStr, preStr, list);
+        } else {
+            ding(monitor, nowStr, preStr, list);
+        }
     }
 
     /**
@@ -130,6 +132,39 @@ public class LogCmdExecutor extends AbstractCmdExecutor {
             message.add(DingMarkdownMessage.getReferenceText(s + "\n"));
         }
         DingTalkHelper.sendMarkdownMsg(message, monitor.getDingToken());
+    }
+
+    /**
+     * 飞书消息发送
+     *
+     * @param monitor
+     * @param nowStr
+     * @param preStr
+     * @param list
+     */
+    private void feishu(LiteMonitorConfigEntity monitor, String nowStr, String preStr, List<String> list) {
+        String title = monitor.getHostName() + "," + monitor.getDingTitle() + "[" + list.size() + "]";
+        if (monitor.getShowCount() == null) {
+            monitor.setShowCount(10);
+        }
+        if (list.size() > monitor.getShowCount()) {
+            title = title + "[展示前" + monitor.getShowCount() + "个]";
+            list = list.subList(0, monitor.getShowCount());
+        }
+        String dingAt = monitor.getDingAt();
+        boolean atAll = ALL.equalsIgnoreCase(dingAt);
+        if (!atAll && StringUtils.isNoneBlank(dingAt)) {
+            String[] atMobiles = dingAt.split(",");
+            title = title + ",@" + String.join(",@", atMobiles);
+        }
+        if (atAll) {
+            title = title + ",@all";
+        }
+        StringBuilder content = new StringBuilder("统计时段:" + preStr + "--" + nowStr + "\n");
+        for (String s : list) {
+            content.append(s + "\n");
+        }
+        FeishuTalkHelper.sendTextMsg(title, content.toString(), monitor.getDingToken());
     }
 
     @Override

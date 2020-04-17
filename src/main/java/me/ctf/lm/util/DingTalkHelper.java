@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
  */
 @Slf4j
 public class DingTalkHelper {
-    private static RestTemplate restTemplate = new RestTemplateBuilder().build();
+    private static final RestTemplate REST_TEMPLATE = new RestTemplateBuilder().build();
 
     /**
      * text钉钉消息发送
@@ -36,7 +36,7 @@ public class DingTalkHelper {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json;charset=UTF-8");
         HttpEntity<String> r = new HttpEntity<>(dingTextMessage.toJsonString(), headers);
-        restTemplate.postForObject("https://oapi.dingtalk.com/robot/send?access_token=" + dingId, r, DingSendResult.class);
+        REST_TEMPLATE.postForObject("https://oapi.dingtalk.com/robot/send?access_token=" + dingId, r, DingSendResult.class);
     }
 
     /**
@@ -49,7 +49,7 @@ public class DingTalkHelper {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json;charset=UTF-8");
         HttpEntity<String> r = new HttpEntity<>(message.toJsonString(), headers);
-        restTemplate.postForObject("https://oapi.dingtalk.com/robot/send?access_token=" + dingId, r, DingSendResult.class);
+        REST_TEMPLATE.postForObject("https://oapi.dingtalk.com/robot/send?access_token=" + dingId, r, DingSendResult.class);
         log.info(message.toJsonString());
     }
 }

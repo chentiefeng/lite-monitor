@@ -86,6 +86,10 @@ public class LiteMonitorConfigEntity {
     @NotBlank(message = "命令不能为空")
     private String shellCmd;
     /**
+     * 提醒类型
+     */
+    private String dingType;
+    /**
      * 钉钉标题
      */
     @NotBlank(message = "钉钉标题不能为空", groups = LogGroup.class)
