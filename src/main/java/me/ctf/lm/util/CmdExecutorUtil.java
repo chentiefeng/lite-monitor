@@ -2,6 +2,7 @@ package me.ctf.lm.util;
 
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -11,6 +12,7 @@ import java.io.IOException;
  * @author: chentiefeng[chentiefeng@linzikg.com]
  * @create: 2019-12-18 10:18
  */
+@Slf4j
 public class CmdExecutorUtil {
 
     /**
@@ -45,6 +47,7 @@ public class CmdExecutorUtil {
     }
 
     private static String execute(String cmd, Session session) throws IOException {
+        log.info("exec cmd: {}",cmd);
         session.execCommand(cmd);
         String result = ProcessStdoutUtil.processStdout(session.getStdout());
         if (StringUtils.isEmpty(result)) {
