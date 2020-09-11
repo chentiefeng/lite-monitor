@@ -25,25 +25,36 @@
           </el-option>
         </el-select>
       </el-form-item>
+      <el-form-item v-if="dataForm.monitorType === 'SQL'" label="schemaName" prop="schemaName">
+          <el-select v-model="dataForm.schemaName" value-key="val" filterable clearable placeholder="请选择">
+            <el-option
+              v-for="item in schemaNames"
+              :key="item.val"
+              :label="item.label"
+              :value="item.val">
+            </el-option>
+          </el-select>
+        </el-form-item>
       <el-form-item label="描述" prop="remark">
         <el-input v-model="dataForm.remark" placeholder="备注"></el-input>
       </el-form-item>
-      <el-form-item label="ip地址" prop="hostName">
-        <el-input v-model="dataForm.hostName" placeholder="ip地址"></el-input>
-      </el-form-item>
-      <el-form-item label="端口" prop="port">
-        <el-input v-model="dataForm.port" placeholder="端口"></el-input>
-      </el-form-item>
-      <el-form-item label="用户" prop="username">
-        <el-input v-model="dataForm.username" placeholder="root"></el-input>
-      </el-form-item>
-      <el-form-item label="密码" prop="pwd">
-        <el-input v-model="dataForm.pwd" placeholder="123456"></el-input>
-      </el-form-item>
-      <el-form-item label="密钥文件地址" prop="pem">
-        <el-input v-model="dataForm.pem" placeholder="/root/.ssh/id_rsa"></el-input>
-      </el-form-item>
-      <!-- LOG monitor start -->
+      <div v-if="dataForm.monitorType === 'LOG'||dataForm.monitorType === 'PROCESS'">
+        <el-form-item label="ip地址" prop="hostName">
+          <el-input v-model="dataForm.hostName" placeholder="ip地址"></el-input>
+        </el-form-item>
+        <el-form-item label="端口" prop="port">
+          <el-input v-model="dataForm.port" placeholder="端口"></el-input>
+        </el-form-item>
+        <el-form-item label="用户" prop="username">
+          <el-input v-model="dataForm.username" placeholder="root"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="pwd">
+          <el-input v-model="dataForm.pwd" placeholder="123456"></el-input>
+        </el-form-item>
+        <el-form-item label="密钥文件地址" prop="pem">
+          <el-input v-model="dataForm.pem" placeholder="/root/.ssh/id_rsa"></el-input>
+        </el-form-item>
+      </div>
       <div v-if="dataForm.monitorType === 'LOG'">
         <el-form-item label="日志文件" prop="filePath">
           <el-input v-model="dataForm.filePath" placeholder="/root/lite-monitor-server/logs/m.log"></el-input>
@@ -63,19 +74,23 @@
         <el-form-item label="统计范围" prop="statSecond">
           <el-input v-model="dataForm.statSecond" placeholder="统计近多少秒之内的日志"></el-input>
         </el-form-item>
+      </div>
+      <div v-if="dataForm.monitorType === 'LOG'||dataForm.monitorType === 'SQL'">
         <el-form-item label="阈值" prop="threshold">
           <el-input v-model="dataForm.threshold" placeholder="阈值"></el-input>
         </el-form-item>
         <el-form-item label="展示条数" prop="showCount">
           <el-input v-model="dataForm.showCount" placeholder="默认展示10"></el-input>
         </el-form-item>
-      </div>
-      <!-- LOG monitor end -->
-      <el-form-item v-if="dataForm.monitorType === 'LOG'" label="命令" prop="shellCmd">
-        <el-input v-model="dataForm.shellCmd" placeholder="awk -F, '{print $1}'"></el-input>
+       </div>
+      <el-form-item v-if="dataForm.monitorType === 'LOG'" label="脚本" prop="script">
+        <el-input v-model="dataForm.script" placeholder="awk -F, '{print $1}'"></el-input>
       </el-form-item>
-      <el-form-item v-if="dataForm.monitorType === 'PROCESS'" label="关键字" prop="shellCmd">
-        <el-input v-model="dataForm.shellCmd" placeholder="lite-monitor-service"></el-input>
+      <el-form-item v-if="dataForm.monitorType === 'PROCESS'" label="关键字" prop="script">
+        <el-input v-model="dataForm.script" placeholder="lite-monitor-service"></el-input>
+      </el-form-item>
+      <el-form-item v-if="dataForm.monitorType === 'SQL'" label="SQL" prop="script">
+        <el-input type='textarea' v-model="dataForm.script" placeholder="select now()"></el-input>
       </el-form-item>
       <el-form-item label="提醒类型" prop="dingType">
         <el-input v-model="dataForm.dingType" placeholder="提醒类型（dingding、feishu）,默认dingding"></el-input>
@@ -106,6 +121,7 @@
           id: undefined,
           monitorType: undefined,
           frequency: undefined,
+          schemaName: undefined,
           hostName: undefined,
           port: 22,
           remark: undefined,
@@ -114,7 +130,7 @@
           pem: undefined,
           filePath: undefined,
           threshold: undefined,
-          shellCmd: undefined,
+          script: undefined,
           dingType: 'dingding',
           dingTitle: undefined,
           dingToken: undefined,
@@ -128,8 +144,15 @@
         }, {
           monitorType: 'PROCESS',
           monitorTypeDesc: '进程'
+        }, {
+          monitorType: 'SQL',
+          monitorTypeDesc: '数据'
         }],
         frequencys: [],
+        schemaNames: [{
+            val: 'risk_biz',
+            label: '风控库'
+        }],
         dataRule: {
           remark: [
             {required: true, message: '描述不能为空', trigger: 'blur'}
@@ -172,6 +195,7 @@
                 this.dataForm.id = data.entity.id
                 this.dataForm.monitorType = data.entity.monitorType
                 this.dataForm.frequency = data.entity.frequency
+                this.dataForm.schemaName = data.entity.schemaName
                 this.dataForm.hostName = data.entity.hostName
                 this.dataForm.port = data.entity.port
                 this.dataForm.remark = data.entity.remark
@@ -180,7 +204,7 @@
                 this.dataForm.pem = data.entity.pem
                 this.dataForm.filePath = data.entity.filePath
                 this.dataForm.threshold = data.entity.threshold
-                this.dataForm.shellCmd = data.entity.shellCmd
+                this.dataForm.script = data.entity.script
                 this.dataForm.dingType = data.entity.dingType
                 this.dataForm.dingTitle = data.entity.dingTitle
                 this.dataForm.dingToken = data.entity.dingToken
@@ -217,6 +241,7 @@
               this.dataForm.id = undefined
               this.dataForm.monitorType = data.entity.monitorType
               this.dataForm.frequency = data.entity.frequency
+              this.dataForm.schemaName = data.entity.schemaName
               this.dataForm.hostName = data.entity.hostName
               this.dataForm.port = data.entity.port
               this.dataForm.remark = data.entity.remark
@@ -225,7 +250,7 @@
               this.dataForm.pem = data.entity.pem
               this.dataForm.filePath = data.entity.filePath
               this.dataForm.threshold = data.entity.threshold
-              this.dataForm.shellCmd = data.entity.shellCmd
+              this.dataForm.script = data.entity.script
               this.dataForm.dingType = data.entity.dingType
               this.dataForm.dingTitle = data.entity.dingTitle
               this.dataForm.dingToken = data.entity.dingToken

@@ -29,7 +29,7 @@ public class PsCmdExecutor extends AbstractCmdExecutor {
     @Override
     public void execute(MonitorConfigEntity monitor) {
         //命令构建
-        String cmd = "ps -ef|grep '" + monitor.getShellCmd() + "'|grep -v grep|awk '{print $2}'";
+        String cmd = "ps -ef|grep '" + monitor.getScript() + "'|grep -v grep|awk '{print $2}'";
         //执行命令
         String psId = null;
         try {

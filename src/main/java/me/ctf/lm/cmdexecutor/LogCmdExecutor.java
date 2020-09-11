@@ -90,8 +90,8 @@ public class LogCmdExecutor extends AbstractCmdExecutor {
         }
         //2019.12.26 日志文件路径支持日期占位符
         cmd.append(" ").append(PlaceholderUtil.analyze(monitor.getFilePath(), null));
-        if (StringUtils.isNoneBlank(monitor.getShellCmd())) {
-            cmd.append(" | ").append(monitor.getShellCmd());
+        if (StringUtils.isNoneBlank(monitor.getScript())) {
+            cmd.append(" | ").append(monitor.getScript());
         }
         return cmd.toString();
     }

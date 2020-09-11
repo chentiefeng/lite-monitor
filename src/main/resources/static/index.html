@@ -36,12 +36,33 @@
                 border
                 v-loading="dataListLoading"
                 style="width: 100%;">
-            <!-- <el-table-column
-              type="selection"
-              header-align="center"
-              align="center"
-              width="50">
-            </el-table-column> -->
+            <el-table-column
+                    prop="monitorType"
+                    header-align="center"
+                    align="center"
+                    width="100"
+                    label="监控类型">
+                <template slot-scope="scope">
+                    <el-tag v-if="scope.row.monitorType === 'LOG'" size="small">日志</el-tag>
+                    <el-tag v-else-if="scope.row.monitorType === 'PROCESS'" size="small">进程</el-tag>
+                    <el-tag v-else-if="scope.row.monitorType === 'SQL'" size="small">数据</el-tag>
+                    <el-tag v-else size="small"></el-tag>
+                </template>
+            </el-table-column>
+
+            <el-table-column
+                    prop="remark"
+                    header-align="left"
+                    align="left"
+                    label="描述">
+            </el-table-column>
+            <el-table-column
+                    prop="schemaName"
+                    header-align="center"
+                    align="center"
+                    width="150"
+                    label="schemaName">
+            </el-table-column>
             <el-table-column
                     prop="hostName"
                     header-align="center"
@@ -55,24 +76,6 @@
                     align="center"
                     width="100"
                     label="端口">
-            </el-table-column>
-            <el-table-column
-                    prop="remark"
-                    header-align="left"
-                    align="left"
-                    label="描述">
-            </el-table-column>
-            <el-table-column
-                    prop="monitorType"
-                    header-align="center"
-                    align="center"
-                    width="100"
-                    label="监控类型">
-                <template slot-scope="scope">
-                    <el-tag v-if="scope.row.monitorType === 'LOG'" size="small">日志</el-tag>
-                    <el-tag v-else-if="scope.row.monitorType === 'PROCESS'" size="small">进程</el-tag>
-                    <el-tag v-else size="small"></el-tag>
-                </template>
             </el-table-column>
             <el-table-column
                     prop="frequencyDesc"

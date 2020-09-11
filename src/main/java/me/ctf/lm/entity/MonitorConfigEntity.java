@@ -39,6 +39,10 @@ public class MonitorConfigEntity {
     @TableField(exist = false)
     private String frequencyDesc;
     /**
+     * schema
+     */
+    private String schemaName;
+    /**
      * 主机
      */
     @NotBlank(message = "主机不能为空")
@@ -77,10 +81,10 @@ public class MonitorConfigEntity {
     @NotNull(message = "阈值不能为空", groups = LogGroup.class)
     private Long threshold;
     /**
-     * 命令
+     * 脚本
      */
-    @NotBlank(message = "命令不能为空")
-    private String shellCmd;
+    @NotBlank(message = "脚本不能为空")
+    private String script;
     /**
      * 提醒类型
      */

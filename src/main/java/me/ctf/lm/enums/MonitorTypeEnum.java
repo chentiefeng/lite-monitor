@@ -14,5 +14,10 @@ public enum MonitorTypeEnum {
     /**
      * 进程
      */
-    PROCESS
+    PROCESS,
+    /**
+     * sql
+     */
+    SQL,
+    ;
 }
