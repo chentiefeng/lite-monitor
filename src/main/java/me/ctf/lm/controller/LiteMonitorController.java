@@ -2,11 +2,10 @@ package me.ctf.lm.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import me.ctf.lm.dto.MapResult;
-import me.ctf.lm.entity.LiteMonitorConfigEntity;
+import me.ctf.lm.entity.MonitorConfigEntity;
 import me.ctf.lm.enums.FrequencyEnum;
 import me.ctf.lm.schedule.ScheduleCmdExecutor;
 import me.ctf.lm.service.LiteMonitorConfigService;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -27,20 +26,12 @@ public class LiteMonitorController {
     /**
      * 分页查询
      *
-     * @param hostName
-     * @param remark
-     * @param page
-     * @param limit
      * @return
      */
     @GetMapping("/page")
-    public MapResult page(@RequestParam(value = "hostName", required = false) String hostName,
-                          @RequestParam(value = "remark", required = false) String remark,
-                          @RequestParam(value = "frequency", required = false) String frequency,
-                          @RequestParam("page") int page, @RequestParam("limit") int limit) {
+    public MapResult page(@RequestParam Map<String, Object> params) {
         try {
-            Page<LiteMonitorConfigEntity> pageObj = liteMonitorConfigService.page(hostName, remark, frequency, null, page, limit);
-            return MapResult.ok().put("page", pageObj);
+            return MapResult.ok().put("page", liteMonitorConfigService.queryPage(params));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return MapResult.error(e.getMessage());
@@ -66,7 +57,7 @@ public class LiteMonitorController {
      * @return
      */
     @PostMapping("/save")
-    public MapResult save(@RequestBody LiteMonitorConfigEntity monitor) {
+    public MapResult save(@RequestBody MonitorConfigEntity monitor) {
         liteMonitorConfigService.save(monitor);
         return MapResult.ok();
     }
@@ -79,7 +70,7 @@ public class LiteMonitorController {
      */
     @GetMapping("/delete")
     public MapResult delete(@RequestParam("id") Long id) {
-        liteMonitorConfigService.delete(id);
+        liteMonitorConfigService.removeById(id);
         return MapResult.ok();
     }
 

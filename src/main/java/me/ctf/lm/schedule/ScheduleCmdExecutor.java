@@ -3,23 +3,23 @@ package me.ctf.lm.schedule;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.extern.slf4j.Slf4j;
 import me.ctf.lm.cmdexecutor.AbstractCmdExecutor;
-import me.ctf.lm.entity.LiteMonitorConfigEntity;
+import me.ctf.lm.entity.MonitorConfigEntity;
 import me.ctf.lm.enums.MonitorEnableEnum;
 import me.ctf.lm.enums.MonitorTypeEnum;
 import me.ctf.lm.service.DistributeTaskService;
 import me.ctf.lm.service.DistributedLockService;
 import me.ctf.lm.service.LiteMonitorConfigService;
 import me.ctf.lm.util.MonitorConfigUtil;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import me.ctf.lm.util.PageUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author: chentiefeng[chentiefeng@linzikg.com]
@@ -63,7 +63,7 @@ public class ScheduleCmdExecutor {
         if (Objects.isNull(ids) || ids.length == 0) {
             return;
         }
-        List<LiteMonitorConfigEntity> monitors = liteMonitorConfigService.findByIds(ids);
+        List<MonitorConfigEntity> monitors = liteMonitorConfigService.listByIds(Arrays.asList(ids));
         execute(monitors);
     }
 
@@ -72,8 +72,8 @@ public class ScheduleCmdExecutor {
      *
      * @param monitors
      */
-    private static void execute(List<LiteMonitorConfigEntity> monitors) {
-        for (LiteMonitorConfigEntity monitor : monitors) {
+    private static void execute(List<MonitorConfigEntity> monitors) {
+        for (MonitorConfigEntity monitor : monitors) {
             int threadNum = executor.getPoolSize() + executor.getQueue().size();
             //120 = queue.size + maximumPoolSize
             int waitTime = 0;
@@ -124,15 +124,20 @@ public class ScheduleCmdExecutor {
      * @param frequency
      */
     private static void single(String frequency) {
-        Pageable pageable = PageRequest.of(0, 100);
-        Page<LiteMonitorConfigEntity> page;
-        do {
-            page = liteMonitorConfigService.page(null, null, frequency, MonitorEnableEnum.ENABLED.getVal(), pageable);
-            if (page.isEmpty()) {
+        int p = 1;
+        while (true) {
+            Map<String, Object> params = new HashMap<>(8);
+            params.put("page", p + "");
+            params.put("limit", "100");
+            params.put("frequency", frequency);
+            params.put("enabled", MonitorEnableEnum.ENABLED.getVal());
+            PageUtils page = liteMonitorConfigService.queryPage(params);
+            if (CollectionUtils.isEmpty(page.getList())) {
                 return;
             }
-            execute(page.getContent());
-        } while (page.hasNext());
+            execute(page.getList().stream().map(r -> (MonitorConfigEntity) r).collect(Collectors.toList()));
+            p = p + 1;
+        }
     }
 
     /**
@@ -149,17 +154,21 @@ public class ScheduleCmdExecutor {
             }
             Long[] ids = new Long[10];
             Arrays.fill(ids, -1L);
-            Pageable pageable = PageRequest.of(0, 100);
-            Page<LiteMonitorConfigEntity> page;
-            do {
-                page = liteMonitorConfigService.page(null, null, frequency, MonitorEnableEnum.ENABLED.getVal(), pageable);
-                if (page.isEmpty()) {
+            int p = 1;
+            while (true) {
+                Map<String, Object> params = new HashMap<>(8);
+                params.put("page", p + "");
+                params.put("limit", "100");
+                params.put("frequency", frequency);
+                params.put("enabled", MonitorEnableEnum.ENABLED.getVal());
+                PageUtils page = liteMonitorConfigService.queryPage(params);
+                if (CollectionUtils.isEmpty(page.getList())) {
                     return;
                 }
                 // 每10个分发
                 int idx = 0;
-                for (LiteMonitorConfigEntity monitor : page) {
-                    ids[idx] = monitor.getId();
+                for (Object monitor : page.getList()) {
+                    ids[idx] = ((MonitorConfigEntity) monitor).getId();
                     if (idx == 9) {
                         idx = 0;
                         send(ids);
@@ -170,7 +179,8 @@ public class ScheduleCmdExecutor {
                 if (ids[0] != -1L) {
                     send(ids);
                 }
-            } while (page.hasNext());
+                p = p + 1;
+            }
         } finally {
             distributedLockService.release(frequency);
         }

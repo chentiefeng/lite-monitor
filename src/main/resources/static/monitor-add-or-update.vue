@@ -4,7 +4,7 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
-             label-width="150px">
+             label-width="120px">
       <el-form-item label="监控类型" prop="monitorType">
         <el-select v-model="dataForm.monitorType" value-key="monitorType" filterable clearable placeholder="请选择">
           <el-option

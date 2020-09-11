@@ -1,12 +1,15 @@
 package me.ctf.lm.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import me.ctf.lm.util.validator.LogGroup;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 轻量监控配置
@@ -14,41 +17,35 @@ import java.util.Date;
  * @author: chentiefeng[chentiefeng@linzikg.com]
  * @create: 2019-12-12 11:53
  */
-@Entity
 @Data
-@Table(name = "lite_monitor_config")
-public class LiteMonitorConfigEntity {
+@TableName("lite_monitor_config")
+public class MonitorConfigEntity {
     /**
      * 主键
      */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @TableId(type = IdType.AUTO)
     private Long id;
     /**
      * 监控类型，进程：PROCESS，日志：LOG
      */
-    @Column(nullable = false)
     @NotBlank(message = "监控类型不能为空")
     private String monitorType;
     /**
      * 频率，cron表达式或者枚举
      */
-    @Column(nullable = false)
     @NotBlank(message = "监控频率不能为空")
     private String frequency;
 
-    @Transient
+    @TableField(exist = false)
     private String frequencyDesc;
     /**
      * 主机
      */
-    @Column(nullable = false)
     @NotBlank(message = "主机不能为空")
     private String hostName;
     /**
      * 用户名
      */
-    @Column(nullable = false)
     @NotBlank(message = "用户名不能为空")
     private String username;
     /**
@@ -63,7 +60,6 @@ public class LiteMonitorConfigEntity {
      * 端口
      */
     @NotNull(message = "端口不能为空")
-    @Column(nullable = false)
     private Integer port;
     /**
      * 文件地址
@@ -119,9 +115,9 @@ public class LiteMonitorConfigEntity {
     /**
      * 创建日期
      */
-    private Date gmtCreate;
+    private LocalDateTime gmtCreate;
     /**
      * 修改日期
      */
-    private Date gmtModified;
+    private LocalDateTime gmtModified;
 }

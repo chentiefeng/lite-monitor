@@ -1,6 +1,6 @@
 package me.ctf.lm.cmdexecutor;
 
-import me.ctf.lm.entity.LiteMonitorConfigEntity;
+import me.ctf.lm.entity.MonitorConfigEntity;
 import me.ctf.lm.enums.MonitorTypeEnum;
 import me.ctf.lm.schedule.ScheduleCmdExecutor;
 import me.ctf.lm.util.CmdExecutorUtil;
@@ -19,7 +19,7 @@ public abstract class AbstractCmdExecutor {
      *
      * @param monitor
      */
-    public abstract void execute(LiteMonitorConfigEntity monitor);
+    public abstract void execute(MonitorConfigEntity monitor);
 
     @PostConstruct
     public void register() {
@@ -40,7 +40,7 @@ public abstract class AbstractCmdExecutor {
      * @param cmd
      * @return
      */
-    protected String cmdExecute(LiteMonitorConfigEntity monitor, String cmd) throws IOException {
+    protected String cmdExecute(MonitorConfigEntity monitor, String cmd) throws IOException {
         if (StringUtils.isNoneBlank(monitor.getPwd())) {
             // 用户名密码认证
             return CmdExecutorUtil.authPasswordAndExecute(monitor.getHostName(), monitor.getPort(), monitor.getUsername(), monitor.getPwd(), cmd);

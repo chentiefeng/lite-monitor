@@ -1,7 +1,7 @@
 package me.ctf.lm.cmdexecutor;
 
 import lombok.extern.slf4j.Slf4j;
-import me.ctf.lm.entity.LiteMonitorConfigEntity;
+import me.ctf.lm.entity.MonitorConfigEntity;
 import me.ctf.lm.enums.DingTypeEnum;
 import me.ctf.lm.enums.MonitorTypeEnum;
 import me.ctf.lm.util.DingMarkdownMessage;
@@ -27,7 +27,7 @@ public class PsCmdExecutor extends AbstractCmdExecutor {
      * @param monitor
      */
     @Override
-    public void execute(LiteMonitorConfigEntity monitor) {
+    public void execute(MonitorConfigEntity monitor) {
         //命令构建
         String cmd = "ps -ef|grep '" + monitor.getShellCmd() + "'|grep -v grep|awk '{print $2}'";
         //执行命令
@@ -54,7 +54,7 @@ public class PsCmdExecutor extends AbstractCmdExecutor {
      *
      * @param monitor
      */
-    private void ding(LiteMonitorConfigEntity monitor) {
+    private void ding(MonitorConfigEntity monitor) {
         DingMarkdownMessage message = new DingMarkdownMessage();
         String title = monitor.getHostName() + "," + monitor.getRemark();
         String dingAt = monitor.getDingAt();
@@ -79,7 +79,7 @@ public class PsCmdExecutor extends AbstractCmdExecutor {
      *
      * @param monitor
      */
-    private void feishu(LiteMonitorConfigEntity monitor) {
+    private void feishu(MonitorConfigEntity monitor) {
         String title = monitor.getHostName() + "," + monitor.getRemark();
         String dingAt = monitor.getDingAt();
         boolean atAll = ALL.equalsIgnoreCase(dingAt);

@@ -1,7 +1,7 @@
 package me.ctf.lm.cmdexecutor;
 
 import lombok.extern.slf4j.Slf4j;
-import me.ctf.lm.entity.LiteMonitorConfigEntity;
+import me.ctf.lm.entity.MonitorConfigEntity;
 import me.ctf.lm.enums.DingTypeEnum;
 import me.ctf.lm.enums.MonitorTypeEnum;
 import me.ctf.lm.util.*;
@@ -32,7 +32,7 @@ public class LogCmdExecutor extends AbstractCmdExecutor {
      * @param monitor
      */
     @Override
-    public void execute(LiteMonitorConfigEntity monitor) {
+    public void execute(MonitorConfigEntity monitor) {
         Date now = new Date();
         Date pre = DateUtils.addSeconds(now, -monitor.getStatSecond().intValue());
         String nowStr = DateFormatUtils.format(now, "yyyy-MM-dd HH:mm:ss");
@@ -62,7 +62,7 @@ public class LogCmdExecutor extends AbstractCmdExecutor {
      * @param cmd
      * @return
      */
-    protected List<String> executeAndParse(LiteMonitorConfigEntity monitor, String cmd) {
+    protected List<String> executeAndParse(MonitorConfigEntity monitor, String cmd) {
         String rst = null;
         try {
             rst = super.cmdExecute(monitor, cmd);
@@ -83,7 +83,7 @@ public class LogCmdExecutor extends AbstractCmdExecutor {
      * @param pre
      * @return
      */
-    private String cmdBuilder(LiteMonitorConfigEntity monitor, Date pre) {
+    private String cmdBuilder(MonitorConfigEntity monitor, Date pre) {
         StringBuilder cmd = new StringBuilder("grep");
         for (String regex : DateTimeRegex.dateUntilNowFormat(pre)) {
             cmd.append(" -e '").append(regex).append("'");
@@ -104,7 +104,7 @@ public class LogCmdExecutor extends AbstractCmdExecutor {
      * @param preStr
      * @param list
      */
-    private void ding(LiteMonitorConfigEntity monitor, String nowStr, String preStr, List<String> list) {
+    private void ding(MonitorConfigEntity monitor, String nowStr, String preStr, List<String> list) {
         DingMarkdownMessage message = new DingMarkdownMessage();
         String title = monitor.getHostName() + "," + monitor.getDingTitle() + "[" + list.size() + "]";
         if (monitor.getShowCount() == null) {
@@ -142,7 +142,7 @@ public class LogCmdExecutor extends AbstractCmdExecutor {
      * @param preStr
      * @param list
      */
-    private void feishu(LiteMonitorConfigEntity monitor, String nowStr, String preStr, List<String> list) {
+    private void feishu(MonitorConfigEntity monitor, String nowStr, String preStr, List<String> list) {
         String title = monitor.getHostName() + "," + monitor.getDingTitle() + "[" + list.size() + "]";
         if (monitor.getShowCount() == null) {
             monitor.setShowCount(10);

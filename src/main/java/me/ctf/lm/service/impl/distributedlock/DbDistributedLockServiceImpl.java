@@ -1,12 +1,15 @@
 package me.ctf.lm.service.impl.distributedlock;
 
-import me.ctf.lm.dao.LiteMonitorExecSupportInfoRepository;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import me.ctf.lm.dao.MonitorExecSupportInfoMapper;
+import me.ctf.lm.entity.MonitorExecSupportInfoEntity;
 import me.ctf.lm.service.DistributedLockService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 
 /**
  * @author: chentiefeng[chentiefeng@linzikg.com]
@@ -17,13 +20,18 @@ import javax.annotation.Resource;
 public class DbDistributedLockServiceImpl implements DistributedLockService {
     private static final String LOCK = "LOCK";
     @Resource
-    private LiteMonitorExecSupportInfoRepository liteMonitorExecSupportInfoRepository;
+    private MonitorExecSupportInfoMapper monitorExecSupportInfoMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean lock(String lockName) {
         try {
-            liteMonitorExecSupportInfoRepository.insertByLockName(LOCK, lockName);
+            MonitorExecSupportInfoEntity entity = new MonitorExecSupportInfoEntity();
+            entity.setInfoType(LOCK);
+            entity.setInfo(lockName);
+            entity.setGmtCreate(LocalDateTime.now());
+            entity.setGmtModified(LocalDateTime.now());
+            monitorExecSupportInfoMapper.insert(entity);
         } catch (Exception e) {
             return false;
         }
@@ -33,7 +41,9 @@ public class DbDistributedLockServiceImpl implements DistributedLockService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean release(String lockName) {
-        liteMonitorExecSupportInfoRepository.deleteByLockName(LOCK, lockName);
+        monitorExecSupportInfoMapper.delete(Wrappers.<MonitorExecSupportInfoEntity>lambdaQuery()
+                .eq(MonitorExecSupportInfoEntity::getInfoType, LOCK)
+                .eq(MonitorExecSupportInfoEntity::getInfo, lockName));
         return true;
     }
 }

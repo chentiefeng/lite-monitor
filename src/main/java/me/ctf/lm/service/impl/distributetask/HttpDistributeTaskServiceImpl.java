@@ -1,12 +1,13 @@
 package me.ctf.lm.service.impl.distributetask;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
-import me.ctf.lm.dao.LiteMonitorExecSupportInfoRepository;
+import me.ctf.lm.dao.MonitorExecSupportInfoMapper;
 import me.ctf.lm.dto.MapResult;
-import me.ctf.lm.entity.LiteMonitorExecSupportInfoEntity;
+import me.ctf.lm.entity.MonitorExecSupportInfoEntity;
 import me.ctf.lm.enums.HostStateEnum;
 import me.ctf.lm.service.DistributeTaskService;
 import me.ctf.lm.util.MonitorConfigUtil;
@@ -25,8 +26,11 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -48,7 +52,7 @@ public class HttpDistributeTaskServiceImpl implements DistributeTaskService<Long
     private static Gson gson = new GsonBuilder().create();
     private static RestTemplate restTemplate = new RestTemplateBuilder().setConnectTimeout(Duration.ofMillis(3000)).build();
     @Resource
-    private LiteMonitorExecSupportInfoRepository liteMonitorExecSupportInfoRepository;
+    private MonitorExecSupportInfoMapper monitorExecSupportInfoMapper;
     @Value("${server.port}")
     private Integer port;
     private ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 1,
@@ -67,11 +71,12 @@ public class HttpDistributeTaskServiceImpl implements DistributeTaskService<Long
     public void distribute(Long[] ids) {
         try {
             log.info("start distribute task.");
-            LocalDateTime localDateTime = LocalDateTime.now().plusMinutes(-MonitorConfigUtil.getDuration());
-            Date gmtModified = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+            LocalDateTime gmtModified = LocalDateTime.now().plusMinutes(-MonitorConfigUtil.getDuration());
             log.info("ids is {}, duration is {}, gmtModified is {}", Arrays.toString(ids), MonitorConfigUtil.getDuration(), gmtModified);
-            List<LiteMonitorExecSupportInfoEntity> list = liteMonitorExecSupportInfoRepository.findByInfoTypeAndGmtModifiedGreaterThanEqual(HOST, gmtModified);
-            String[] hosts = list.stream().map(LiteMonitorExecSupportInfoEntity::getInfo).toArray(String[]::new);
+            List<MonitorExecSupportInfoEntity> list = monitorExecSupportInfoMapper.selectList(Wrappers.<MonitorExecSupportInfoEntity>lambdaQuery()
+                    .ge(MonitorExecSupportInfoEntity::getGmtModified, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(gmtModified))
+                    .eq(MonitorExecSupportInfoEntity::getInfo, HOST));
+            String[] hosts = list.stream().map(MonitorExecSupportInfoEntity::getInfo).toArray(String[]::new);
             log.info("distribute host list {}", Arrays.toString(hosts));
             if (hosts.length == 0) {
                 return;
@@ -105,15 +110,18 @@ public class HttpDistributeTaskServiceImpl implements DistributeTaskService<Long
             String host = getHost();
             log.info("Http distribute task service register host {}", host);
             do {
-                LiteMonitorExecSupportInfoEntity supportInfo = liteMonitorExecSupportInfoRepository.findByInfoTypeAndInfo(HOST, host);
+                MonitorExecSupportInfoEntity supportInfo = monitorExecSupportInfoMapper.selectOne(
+                        Wrappers.<MonitorExecSupportInfoEntity>lambdaQuery()
+                                .eq(MonitorExecSupportInfoEntity::getInfoType, HOST)
+                                .eq(MonitorExecSupportInfoEntity::getInfo, host));
                 if (Objects.isNull(supportInfo)) {
-                    supportInfo = new LiteMonitorExecSupportInfoEntity();
+                    supportInfo = new MonitorExecSupportInfoEntity();
                     supportInfo.setInfoType(HOST);
                     supportInfo.setInfo(host);
-                    supportInfo.setGmtCreate(new Date());
+                    supportInfo.setGmtCreate(LocalDateTime.now());
                 }
-                supportInfo.setGmtModified(new Date());
-                liteMonitorExecSupportInfoRepository.save(supportInfo);
+                supportInfo.setGmtModified(LocalDateTime.now());
+                monitorExecSupportInfoMapper.insert(supportInfo);
                 //每1秒检查一次
                 try {
                     TimeUnit.SECONDS.sleep(CHECK_DURATION_SECOND);
