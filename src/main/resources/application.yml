@@ -48,7 +48,6 @@ spring:
           schema: classpath:db/schema.sql
 
 
-
 monitor:
   #是否集群，集群模式请用MySQL,注释掉h2部分，会分发定时任务 false/true
   cluster: false
