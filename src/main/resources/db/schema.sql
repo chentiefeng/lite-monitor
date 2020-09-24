@@ -16,7 +16,7 @@ create table if not exists lite_monitor_config
     ding_type     varchar(64)          null comment '提醒类型',
     ding_title   varchar(64)          null comment '钉钉标题',
     ding_token   varchar(255)          null comment '钉钉token',
-    sign_key   varchar(64)          null comment '钉钉签名Key',
+    sign_key   varchar(255)          null comment '钉钉签名Key',
     ding_at      varchar(256)         null comment '钉钉at',
     show_count   tinyint              null comment '钉钉展示条数',
     remark       varchar(256)         null comment '备注',
