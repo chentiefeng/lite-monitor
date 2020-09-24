@@ -58,7 +58,7 @@ public class LiteMonitorController {
      */
     @PostMapping("/save")
     public MapResult save(@RequestBody MonitorConfigEntity monitor) {
-        liteMonitorConfigService.save(monitor);
+        liteMonitorConfigService.submit(monitor);
         return MapResult.ok();
     }
 

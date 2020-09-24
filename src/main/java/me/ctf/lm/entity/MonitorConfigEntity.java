@@ -83,7 +83,6 @@ public class MonitorConfigEntity {
     /**
      * 脚本
      */
-    @NotBlank(message = "脚本不能为空")
     private String script;
     /**
      * 提醒类型
