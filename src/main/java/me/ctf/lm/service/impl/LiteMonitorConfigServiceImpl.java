@@ -49,7 +49,7 @@ public class LiteMonitorConfigServiceImpl extends ServiceImpl<MonitorConfigMappe
                 entity.setDingAt(dingAt);
             }
         }
-        monitorConfigMapper.insert(entity);
+        saveOrUpdate(entity);
         return entity.getId();
     }
 
