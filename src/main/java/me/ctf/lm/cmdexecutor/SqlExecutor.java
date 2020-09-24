@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,7 +36,11 @@ public class SqlExecutor extends AbstractCmdExecutor {
         try {
             DynamicDataSourceContextHolder.push(monitor.getSchemaName());
             List<Map<String, Object>> maps = jdbcTemplate.queryForList(monitor.getScript());
-            List<String> list = maps.stream().filter(m-> m.values().stream().anyMatch(Objects::nonNull)).map(Object::toString).collect(Collectors.toList());
+            List<Object> values = new ArrayList<>();
+            for (Map<String, Object> map : maps) {
+                values.addAll(map.values());
+            }
+            List<String> list = values.stream().filter(Objects::nonNull).map(Object::toString).collect(Collectors.toList());
             if (list.size() < monitor.getThreshold()) {
                 return;
             }
