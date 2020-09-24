@@ -11,6 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * @author: chentiefeng[chentiefeng@linzikg.com]
@@ -71,7 +74,17 @@ public class PsCmdExecutor extends AbstractCmdExecutor {
         message.setTitle(title);
         message.add(DingMarkdownMessage.getHeaderText(3, title));
         message.add(DingMarkdownMessage.getReferenceText("进程不存在，请及时处理"));
-        DingTalkHelper.sendMarkdownMsg(message, monitor.getDingToken());
+        if (StringUtils.isNotBlank(monitor.getSignKey())) {
+            long timestamp = System.currentTimeMillis();
+            try {
+                String sign = DingTalkHelper.sign(timestamp, monitor.getSignKey());
+                DingTalkHelper.sendMarkdownMsg(message, monitor.getDingToken(), timestamp, sign);
+            } catch (NoSuchAlgorithmException | UnsupportedEncodingException | InvalidKeyException e) {
+                log.error(e.getMessage(), e);
+            }
+        } else {
+            DingTalkHelper.sendMarkdownMsg(message, monitor.getDingToken());
+        }
     }
 
     /**

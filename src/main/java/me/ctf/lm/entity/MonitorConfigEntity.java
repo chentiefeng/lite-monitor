@@ -97,6 +97,10 @@ public class MonitorConfigEntity {
     @NotBlank(message = "钉钉token不能为空")
     private String dingToken;
     /**
+     * 钉钉签名Key
+     */
+    private String signKey;
+    /**
      * 钉钉展示条数
      */
     @NotNull(message = "钉钉展示条数不能为空", groups = LogGroup.class)

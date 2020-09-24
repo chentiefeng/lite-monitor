@@ -11,6 +11,9 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -131,7 +134,17 @@ public class LogCmdExecutor extends AbstractCmdExecutor {
         for (String s : list) {
             message.add(DingMarkdownMessage.getReferenceText(s + "\n"));
         }
-        DingTalkHelper.sendMarkdownMsg(message, monitor.getDingToken());
+        if(StringUtils.isNotBlank(monitor.getSignKey())) {
+            long timestamp = System.currentTimeMillis();
+            try {
+                String sign = DingTalkHelper.sign(timestamp, monitor.getSignKey());
+                DingTalkHelper.sendMarkdownMsg(message, monitor.getDingToken(), timestamp, sign);
+            } catch (NoSuchAlgorithmException | UnsupportedEncodingException | InvalidKeyException e) {
+                log.error(e.getMessage(), e);
+            }
+        }else {
+            DingTalkHelper.sendMarkdownMsg(message, monitor.getDingToken());
+        }
     }
 
     /**

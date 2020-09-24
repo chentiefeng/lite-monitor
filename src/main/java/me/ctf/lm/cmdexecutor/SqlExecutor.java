@@ -1,6 +1,7 @@
 package me.ctf.lm.cmdexecutor;
 
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
+import lombok.extern.slf4j.Slf4j;
 import me.ctf.lm.entity.MonitorConfigEntity;
 import me.ctf.lm.enums.DingTypeEnum;
 import me.ctf.lm.enums.MonitorTypeEnum;
@@ -10,9 +11,11 @@ import me.ctf.lm.util.FeishuTalkHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +29,7 @@ import static me.ctf.lm.cmdexecutor.LogCmdExecutor.ALL;
  * @date 2020-09-11 16:18
  */
 @Component
+@Slf4j
 public class SqlExecutor extends AbstractCmdExecutor {
 
     @Resource
@@ -87,7 +91,17 @@ public class SqlExecutor extends AbstractCmdExecutor {
         for (String s : list) {
             message.add(DingMarkdownMessage.getReferenceText(s + "\n"));
         }
-        DingTalkHelper.sendMarkdownMsg(message, monitor.getDingToken());
+        if(StringUtils.isNotBlank(monitor.getSignKey())) {
+            long timestamp = System.currentTimeMillis();
+            try {
+                String sign = DingTalkHelper.sign(timestamp, monitor.getSignKey());
+                DingTalkHelper.sendMarkdownMsg(message, monitor.getDingToken(), timestamp, sign);
+            } catch (NoSuchAlgorithmException | UnsupportedEncodingException | InvalidKeyException e) {
+                log.error(e.getMessage(), e);
+            }
+        }else {
+            DingTalkHelper.sendMarkdownMsg(message, monitor.getDingToken());
+        }
     }
 
     /**

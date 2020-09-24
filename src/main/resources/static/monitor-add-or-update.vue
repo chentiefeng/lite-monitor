@@ -101,6 +101,9 @@
       <el-form-item label="机器人token" prop="dingToken">
         <el-input v-model="dataForm.dingToken" placeholder="机器人token"></el-input>
       </el-form-item>
+      <el-form-item label="签名Key" prop="signKey">
+        <el-input v-model="dataForm.signKey" placeholder="签名Key"></el-input>
+      </el-form-item>
       <el-form-item label="@人员" prop="dingAt">
         <el-input v-model="dataForm.dingAt" placeholder="多个手机号用英文逗号分割"></el-input>
       </el-form-item>
@@ -134,6 +137,7 @@
           dingType: 'dingding',
           dingTitle: undefined,
           dingToken: undefined,
+          signKey: undefined,
           statSecond: undefined,
           showCount: 10,
           dingAt: undefined
@@ -199,6 +203,7 @@
                 this.dataForm.dingType = data.entity.dingType
                 this.dataForm.dingTitle = data.entity.dingTitle
                 this.dataForm.dingToken = data.entity.dingToken
+                this.dataForm.signKey = data.entity.signKey
                 this.dataForm.statSecond = data.entity.statSecond
                 this.dataForm.showCount = data.entity.showCount
                 this.dataForm.dingAt = data.entity.dingAt
@@ -245,6 +250,7 @@
               this.dataForm.dingType = data.entity.dingType
               this.dataForm.dingTitle = data.entity.dingTitle
               this.dataForm.dingToken = data.entity.dingToken
+              this.dataForm.signKey = data.entity.signKey
               this.dataForm.statSecond = data.entity.statSecond
               this.dataForm.showCount = data.entity.showCount
               this.dataForm.dingAt = data.entity.dingAt
