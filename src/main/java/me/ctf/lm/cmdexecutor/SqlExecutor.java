@@ -10,9 +10,12 @@ import me.ctf.lm.util.FeishuTalkHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static me.ctf.lm.cmdexecutor.LogCmdExecutor.ALL;
@@ -31,7 +34,8 @@ public class SqlExecutor extends AbstractCmdExecutor {
     public void execute(MonitorConfigEntity monitor) {
         try {
             DynamicDataSourceContextHolder.push(monitor.getSchemaName());
-            List<String> list = jdbcTemplate.queryForList(monitor.getScript()).stream().map(Object::toString).collect(Collectors.toList());
+            List<Map<String, Object>> maps = jdbcTemplate.queryForList(monitor.getScript());
+            List<String> list = maps.stream().filter(m-> m.values().stream().anyMatch(Objects::nonNull)).map(Object::toString).collect(Collectors.toList());
             if (list.size() < monitor.getThreshold()) {
                 return;
             }
