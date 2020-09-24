@@ -150,27 +150,18 @@
         }],
         frequencys: [],
         schemaNames: [{
-            val: 'risk_biz',
+            val: 'risk',
             label: '风控库'
         }],
         dataRule: {
           remark: [
             {required: true, message: '描述不能为空', trigger: 'blur'}
           ],
-          hostName: [
-            {required: true, message: 'ip地址不能为空', trigger: 'blur'}
-          ],
-          port: [
-            {required: true, message: '端口不能为空', trigger: 'blur'}
-          ],
           monitorType: [
             {required: true, message: '监控类型不能为空', trigger: 'blur'}
           ],
           frequency: [
             {required: true, message: '监控频率不能为空', trigger: 'blur'}
-          ],
-          username: [
-            {required: true, message: '用户名不能为空', trigger: 'blur'}
           ],
           dingToken: [
             {required: true, message: '钉钉机器人token不能为空', trigger: 'blur'}
