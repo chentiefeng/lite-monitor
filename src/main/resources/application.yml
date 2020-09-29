@@ -46,6 +46,11 @@ spring:
           password: 123456
           driver-class-name: org.h2.Driver
           schema: classpath:db/schema.sql
+        risk:
+          url: jdbc:mysql://rr-bp16cbk5q9llz2k20.mysql.rds.aliyuncs.com:3306/risk_biz?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+          username: risk_readonly
+          password: Linzi@9527
+          driver-class-name: com.mysql.jdbc.Driver
 
 
 monitor:
